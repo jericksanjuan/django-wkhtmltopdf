@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import datetime
 from tempfile import NamedTemporaryFile
 
 from django.conf import settings
@@ -237,7 +238,8 @@ class PDFTemplateMixin(object):
     """Class-based view for HTML templates rendered to PDF."""
 
     # Filename for downloaded PDF. If None, the response is inline.
-    filename = 'rendered_pdf.pdf'
+    filename = ""
+    filename_prefix = ""
 
     # Send file as attachement. If True render content in the browser.
     show_content_in_browser = False
@@ -270,8 +272,22 @@ class PDFTemplateMixin(object):
 
         return super(PDFTemplateMixin, self).get(request, *args, **kwargs)
 
+    # TODO: Create a more robust automatic naming for the pdf.
     def get_filename(self):
-        return self.filename
+        if self.filename:
+            return self.filename
+
+        today = datetime.datetime.today()
+        if self.filename_prefix:
+            prefix = self.filename_prefix
+        elif getattr(self, 'object', None):
+            prefix = '{}'.format(self.object.pk)
+        elif getattr(self, 'model', None):
+            prefix = self.model.__name__.replace(' ', '').lower()
+
+        filename = today.strftime('-%y%b%d.pdf')
+
+        return prefix + filename
 
     def get_cmd_options(self):
         return self.cmd_options
