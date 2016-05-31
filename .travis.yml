@@ -8,8 +8,15 @@ env:
   - DJANGO="Django>=1.4,<1.5"
   - DJANGO="Django>=1.5,<1.6"
   - DJANGO="Django>=1.6,<1.7"
+  - DJANGO="Django>=1.7,<1.8"
+  - DJANGO="Django>=1.8,<1.9"
+
 matrix:
   exclude:
+    - python: "2.6"
+      env: DJANGO="Django>=1.7,<1.8"
+    - python: "2.6"
+      env: DJANGO="Django>=1.8,<1.9"
     - python: "3.3"
       env: DJANGO="Django>=1.4,<1.5"
     - python: "3.4"
@@ -18,13 +25,13 @@ before_install:
   - PWD=`pwd`
   - "echo '## Installing dependencies'"
   - "sudo apt-get update"
-  - "sudo apt-get install -y openssl build-essential xorg libssl-dev"
-  - "echo '## Downloading wkhtmltopdf 0.12.0'"
-  - "wget http://downloads.sourceforge.net/project/wkhtmltopdf/0.12.0/wkhtmltox-linux-amd64_0.12.0-03c001d.tar.xz"
-  - "mkdir -p $PWD"
-  - "echo '## Extracting wkhtmltox into $PWD'"
-  - "tar xvJf wkhtmltox-linux-amd64_0.12.0-03c001d.tar.xz -C $PWD"
-  - "export WKHTMLTOPDF_CMD=$PWD/wkhtmltox/bin/wkhtmltopdf"
+  - "sudo apt-get install -y openssl build-essential xorg libssl-dev xfonts-75dpi"
+  - "echo '## Downloading wkhtmltopdf'"
+  - "wget http://download.gna.org/wkhtmltopdf/0.12/0.12.2.1/wkhtmltox-0.12.2.1_linux-wheezy-amd64.deb"
+  - "echo '## Installing wkhtmltox'"
+  - "sudo dpkg -i wkhtmltox-0.12.2.1_linux-wheezy-amd64.deb"
+  - WHICH_WK=`which wkhtmltopdf`
+  - "export WKHTMLTOPDF_CMD=$WHICH_WK"
 install:
   - pip install $DJANGO
   - pip install -r test_requirements.txt
